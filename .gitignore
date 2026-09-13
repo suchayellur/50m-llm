@@ -1,0 +1,9 @@
+__pycache__/
+.venv/
+tokenizer/
+runs/
+eval_results/
+*.pt
+*.bin
+*.safetensors
+crypto_train.txt
