@@ -129,7 +129,7 @@ class HackathonLMForCausalLM(PreTrainedModel):
         if config.tie_word_embeddings:
             self.lm_head.weight = self.embed_tokens.weight
 
-    def tie_weights(self):
+    def tie_weights(self, *args, **kwargs):
         if self.config.tie_word_embeddings:
             self.lm_head.weight = self.embed_tokens.weight
 
