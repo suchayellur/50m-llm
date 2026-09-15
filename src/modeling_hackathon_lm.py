@@ -125,8 +125,9 @@ class HackathonLMForCausalLM(PreTrainedModel):
         self.final_norm = nn.LayerNorm(config.hidden_size, eps=1e-5)
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
         self.post_init()
+
         if config.tie_word_embeddings:
-            self.tie_weights()
+            self.lm_head.weight = self.embed_tokens.weight
 
     def tie_weights(self):
         if self.config.tie_word_embeddings:
