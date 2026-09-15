@@ -134,6 +134,30 @@ python scripts/train.py --config configs/final_49m.json --tokenizer tokenizer --
 
 The script prints and saves the model config, parameter count, GPU type, precision mode, elapsed time, tokens seen, and estimated FLOPs.
 
+## Experiment logging
+
+Every training run writes two experiment reports inside `--output-dir`:
+
+- `run_log.json`: machine-readable experiment metadata
+- `run_report.md`: human-readable summary
+
+The log records the model config, exact trainable parameter count, random seed, dataset name/version/mixture, local files, total training tokens, optimizer, learning rate, batch size, sequence length, precision, GPU name/count, start/end time, duration, peak GPU memory, checkpoints, final training loss, software versions, and git commit.
+
+Useful logging flags:
+
+```bash
+python scripts/train.py \
+  --config configs/final_49m.json \
+  --tokenizer tokenizer \
+  --dataset tinystories \
+  --dataset-revision main \
+  --dataset-mixture tinystories:1.0 \
+  --seed 1337 \
+  --output-dir runs/final
+```
+
+The training script also asserts that trainable parameters are `<= 50,000,000` before optimization begins.
+
 ## Resume training
 
 ```bash

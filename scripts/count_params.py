@@ -24,10 +24,14 @@ def main():
     config = HackathonLMConfig.from_json_file(str(config_path))
     model = HackathonLMForCausalLM(config)
     total = count_trainable(model)
+    weights_tied = model.get_input_embeddings().weight is model.get_output_embeddings().weight
 
     print(json.dumps(config.to_dict(), indent=2))
+    print(f"Input/output weights tied: {weights_tied}")
     print(f"Trainable parameters: {total:,}")
     print(f"Parameter limit:       {LIMIT:,}")
+    if config.tie_word_embeddings:
+        assert weights_tied, "tie_word_embeddings is true, but input and output weights are not the same tensor"
     assert total <= LIMIT, f"Model has {total:,} trainable parameters, above {LIMIT:,}"
 
 

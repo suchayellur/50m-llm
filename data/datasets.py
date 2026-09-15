@@ -1,18 +1,49 @@
-from itertools import cycle
-
 from datasets import load_dataset
 
 
-def fineweb_stream(split="train"):
-    dataset = load_dataset("HuggingFaceFW/fineweb-edu", name="sample-10BT", split=split, streaming=True)
+DATASET_METADATA = {
+    "fineweb": {
+        "path": "HuggingFaceFW/fineweb-edu",
+        "name": "sample-10BT",
+        "default_revision": "main",
+    },
+    "tinystories": {
+        "path": "roneneldan/TinyStories",
+        "name": None,
+        "default_revision": "main",
+    },
+    "local": {
+        "path": "local text files",
+        "name": None,
+        "default_revision": "user-provided",
+    },
+}
+
+
+def dataset_metadata(dataset_name, revision=None, mixture=None, local_files=None):
+    meta = dict(DATASET_METADATA[dataset_name])
+    meta["revision"] = revision or meta["default_revision"]
+    meta["mixture"] = mixture or f"{dataset_name}:1.0"
+    meta["local_files"] = local_files or []
+    return meta
+
+
+def fineweb_stream(split="train", revision=None):
+    dataset = load_dataset(
+        "HuggingFaceFW/fineweb-edu",
+        name="sample-10BT",
+        split=split,
+        streaming=True,
+        revision=revision,
+    )
     for row in dataset:
         text = row.get("text", "")
         if text:
             yield text
 
 
-def tinystories_stream(split="train"):
-    dataset = load_dataset("roneneldan/TinyStories", split=split, streaming=True)
+def tinystories_stream(split="train", revision=None):
+    dataset = load_dataset("roneneldan/TinyStories", split=split, streaming=True, revision=revision)
     for row in dataset:
         text = row.get("text", "")
         if text:
@@ -28,11 +59,11 @@ def local_text_stream(paths):
                     yield line
 
 
-def choose_text_stream(dataset_name, local_files=None):
+def choose_text_stream(dataset_name, local_files=None, revision=None):
     if dataset_name == "tinystories":
-        return tinystories_stream()
+        return tinystories_stream(revision=revision)
     if dataset_name == "fineweb":
-        return fineweb_stream()
+        return fineweb_stream(revision=revision)
     if dataset_name == "local":
         return local_text_stream(local_files or [])
     raise ValueError(f"Unknown dataset_name: {dataset_name}")
